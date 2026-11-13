@@ -1,0 +1,57 @@
+$ docker build --no-cache -t devops-final:local .
+Sending build context to Docker daemon  251.9kB
+
+Step 1/10 : FROM node:20-alpine
+ ---> fb4cd12c85ee
+Step 2/10 : WORKDIR /app
+ ---> Running in b9290dfac34f
+ ---> Removed intermediate container b9290dfac34f
+ ---> 5e45f09ee771
+Step 3/10 : COPY package.json package-lock.json ./
+ ---> 42f1b98d5569
+Step 4/10 : RUN npm ci --omit=dev && npm cache clean --force
+ ---> Running in fd96ed8c27ad
+[91mnpm warn deprecated prom-client@15.1.3: prom-client has been replaced by @prometheus-io/client
+[0m
+added 83 packages, and audited 84 packages in 12s
+
+30 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+[91mnpm notice
+npm notice New major version of npm available! 10.8.2 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice
+[0m[91mnpm warn using --force Recommended protections disabled.
+[0m ---> Removed intermediate container fd96ed8c27ad
+ ---> a8a7ad142891
+Step 5/10 : COPY src ./src
+ ---> 1b85f9f87e7b
+Step 6/10 : ENV NODE_ENV=production
+ ---> Running in f5bccf6dc3be
+ ---> Removed intermediate container f5bccf6dc3be
+ ---> 3a5f4e1183e4
+Step 7/10 : ENV PORT=3000
+ ---> Running in 333298ae4536
+ ---> Removed intermediate container 333298ae4536
+ ---> affe230ccb72
+Step 8/10 : EXPOSE 3000
+ ---> Running in f3e91adb9e09
+ ---> Removed intermediate container f3e91adb9e09
+ ---> 768dc49eab34
+Step 9/10 : USER node
+ ---> Running in 6584852ebba9
+ ---> Removed intermediate container 6584852ebba9
+ ---> db788889e8c5
+Step 10/10 : CMD ["node", "src/server.js"]
+ ---> Running in 63050d26e780
+ ---> Removed intermediate container 63050d26e780
+ ---> cc5173b4cb7c
+Successfully built cc5173b4cb7c
+Successfully tagged devops-final:local
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+

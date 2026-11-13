@@ -1,0 +1,86 @@
+- name: Deploy devops-final stack
+  hosts: localhost
+  connection: local
+  gather_facts: true
+
+  vars:
+    project_dir: "{{ playbook_dir }}/.."
+    deploy_dir: /opt/devops-final
+    deploy_owner: "{{ ansible_facts['user_id'] }}"
+    use_become: true
+    app_image: "ghcr.io/{{ github_owner | default('Tivrus') | lower }}/devops-final:latest"
+
+  tasks:
+    - name: Check docker
+      ansible.builtin.command: docker --version
+      register: docker_check
+      changed_when: false
+      failed_when: false
+
+    - name: Install docker
+      when: docker_check.rc != 0
+      become: true
+      block:
+        - name: Install packages
+          ansible.builtin.apt:
+            name:
+              - docker.io
+              - docker-compose-v2
+            state: present
+            update_cache: true
+
+        - name: Start docker service
+          ansible.builtin.service:
+            name: docker
+            state: started
+            enabled: true
+
+    - name: Create deploy directory
+      become: "{{ use_become }}"
+      ansible.builtin.file:
+        path: "{{ deploy_dir }}"
+        state: directory
+        owner: "{{ deploy_owner }}"
+        mode: "0755"
+
+    - name: Copy compose and prometheus config
+      become: "{{ use_become }}"
+      ansible.builtin.copy:
+        src: "{{ project_dir }}/{{ item }}"
+        dest: "{{ deploy_dir }}/{{ item }}"
+        owner: "{{ deploy_owner }}"
+        mode: "0644"
+      loop:
+        - docker-compose.yml
+        - prometheus.yml
+
+    - name: Copy grafana provisioning
+      become: "{{ use_become }}"
+      ansible.builtin.copy:
+        src: "{{ project_dir }}/grafana/"
+        dest: "{{ deploy_dir }}/grafana/"
+        owner: "{{ deploy_owner }}"
+        mode: "0644"
+        directory_mode: "0755"
+
+    - name: Start stack
+      ansible.builtin.command: docker compose up -d --no-build
+      args:
+        chdir: "{{ deploy_dir }}"
+      environment:
+        APP_IMAGE: "{{ app_image }}"
+      register: compose_up
+      changed_when: compose_up.stderr is search('Creat|Recreat|Start|Pull')
+
+    - name: Show containers
+      ansible.builtin.command: docker compose ps --format "{{ '{{' }}.Service{{ '}}' }} {{ '{{' }}.State{{ '}}' }}"
+      args:
+        chdir: "{{ deploy_dir }}"
+      environment:
+        APP_IMAGE: "{{ app_image }}"
+      register: compose_ps
+      changed_when: false
+
+    - name: Print state
+      ansible.builtin.debug:
+        var: compose_ps.stdout_lines

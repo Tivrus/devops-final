@@ -1,0 +1,52 @@
+$ find . -path ./node_modules -prune -o -path ./.git -prune -o -type f -print | sort
+./ansible/ansible.cfg
+./ansible/deploy.yml
+./ansible/inventory.ini
+./docker-compose.yml
+./Dockerfile
+./.dockerignore
+./eslint.config.js
+./.github/workflows/ci-cd.yml
+./.gitignore
+./grafana/provisioning/dashboards/dashboards.yml
+./grafana/provisioning/dashboards/devops-final.json
+./grafana/provisioning/datasources/prometheus.yml
+./package.json
+./package-lock.json
+./prometheus.yml
+./src/app.js
+./src/db.js
+./src/metrics.js
+./src/server.js
+./__tests__/app.test.js
+./__tests__/db.test.js
+$ cat Dockerfile
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev && npm cache clean --force
+
+COPY src ./src
+
+ENV NODE_ENV=production
+ENV PORT=3000
+EXPOSE 3000
+
+USER node
+CMD ["node", "src/server.js"]
+$ cat .dockerignore
+node_modules
+.git
+.github
+__tests__
+coverage
+.env
+*.log
+ansible
+grafana
+prometheus.yml
+docker-compose.yml
+screenshots
+*.md

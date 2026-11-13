@@ -1,0 +1,18 @@
+$ curl -s http://localhost:9090/api/v1/targets | python3 -c 'import json,sys; [print(t["labels"]["job"], t["scrapeUrl"], t["health"], t["lastError"] or "-") for t in json.load(sys.stdin)["data"]["activeTargets"]]'
+app http://app:3000/metrics up -
+prometheus http://localhost:9090/metrics up -
+$ curl -s 'http://localhost:9090/api/v1/query?query=up' | python3 -m json.tool --compact
+{"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"up","instance":"app:3000","job":"app"},"value":[1794564405.488,"1"]},{"metric":{"__name__":"up","instance":"localhost:9090","job":"prometheus"},"value":[1794564405.488,"1"]}]}}
+$ curl -s http://localhost:3001/api/health; echo
+{
+  "database": "ok",
+  "version": "12.1.0",
+  "commit": "ccd7b6ce7ea6184b8c7eb1de044174147dd9a648"
+}
+$ curl -s -u admin:admin http://localhost:3001/api/datasources | python3 -m json.tool | grep -E "\"(name|type|url|isDefault)\""
+        "name": "Prometheus",
+        "type": "prometheus",
+        "url": "http://prometheus:9090",
+        "isDefault": true,
+$ curl -s -u admin:admin http://localhost:3001/api/datasources/uid/prometheus/health; echo
+{"details":{"application":"Prometheus","features":{"rulerApiEnabled":false}},"message":"Successfully queried the Prometheus API.","status":"OK"}

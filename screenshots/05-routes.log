@@ -1,0 +1,22 @@
+$ curl -s -i http://localhost:3000/
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Content-Type: text/html; charset=utf-8
+Content-Length: 20
+ETag: W/"14-CO/nnbi20M5IBXcBZzh/YhL/X9Y"
+Date: Fri, 13 Nov 2026 10:06:22 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+DevOps Final Project$ curl -s http://localhost:3000/health; echo
+{"status":"ok"}
+$ curl -s http://localhost:3000/metrics | grep -E "^# (HELP|TYPE) http_requests_total|^http_requests_total|^process_cpu_user|^nodejs_heap_size_used"
+process_cpu_user_seconds_total 0.34006400000000003
+nodejs_heap_size_used_bytes 7130952
+# HELP http_requests_total Total number of HTTP requests
+# TYPE http_requests_total counter
+http_requests_total{method="GET",route="/metrics",status="200"} 4
+http_requests_total{method="GET",route="/",status="200"} 1
+http_requests_total{method="GET",route="/health",status="200"} 1
+$ curl -s http://localhost:3000/metrics | grep -c "^# TYPE"
+32

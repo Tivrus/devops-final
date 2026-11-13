@@ -1,0 +1,64 @@
+$ docker compose up -d --build
+Sending build context to Docker daemon  57.66kB
+
+Step 1/11 : FROM node:20-alpine
+ ---> fb4cd12c85ee
+Step 2/11 : WORKDIR /app
+ ---> Using cache
+ ---> 5e45f09ee771
+Step 3/11 : COPY package.json package-lock.json ./
+ ---> Using cache
+ ---> 42f1b98d5569
+Step 4/11 : RUN npm ci --omit=dev && npm cache clean --force
+ ---> Using cache
+ ---> a8a7ad142891
+Step 5/11 : COPY src ./src
+ ---> Using cache
+ ---> 1b85f9f87e7b
+Step 6/11 : ENV NODE_ENV=production
+ ---> Using cache
+ ---> 3a5f4e1183e4
+Step 7/11 : ENV PORT=3000
+ ---> Using cache
+ ---> affe230ccb72
+Step 8/11 : EXPOSE 3000
+ ---> Using cache
+ ---> 768dc49eab34
+Step 9/11 : USER node
+ ---> Using cache
+ ---> db788889e8c5
+Step 10/11 : CMD ["node", "src/server.js"]
+ ---> Using cache
+ ---> cc5173b4cb7c
+Step 11/11 : LABEL com.docker.compose.image.builder=classic
+ ---> Running in 37c5a6413f19
+ ---> Removed intermediate container 37c5a6413f19
+ ---> 6445e20c0594
+Successfully built 6445e20c0594
+Successfully tagged devops-final:local
+time="2026-11-13T13:05:49+03:00" level=warning msg="buildx Docker CLI plugin not found: falling back to the classic builder. BuildKit-only build features (multi-arch, secrets, ssh, additional contexts, ...) will not be available"
+ Image devops-final:local Building 
+ Image devops-final:local Building 
+ Image devops-final:local Built 
+ Image devops-final:local Built 
+ Network devops-final_default Creating 
+ Network devops-final_default Creating 
+ Network devops-final_default Created 
+ Network devops-final_default Created 
+ Container devops-final-app-1 Creating 
+ Container devops-final-app-1 Created 
+ Container devops-final-prometheus-1 Creating 
+ Container devops-final-prometheus-1 Created 
+ Container devops-final-grafana-1 Creating 
+ Container devops-final-grafana-1 Created 
+ Container devops-final-app-1 Starting 
+ Container devops-final-app-1 Started 
+ Container devops-final-prometheus-1 Starting 
+ Container devops-final-prometheus-1 Started 
+ Container devops-final-grafana-1 Starting 
+ Container devops-final-grafana-1 Started 
+$ docker compose ps
+NAME                        IMAGE                    COMMAND                  SERVICE      CREATED         STATUS         PORTS
+devops-final-app-1          devops-final:local       "docker-entrypoint.s…"   app          4 seconds ago   Up 3 seconds   0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp
+devops-final-grafana-1      grafana/grafana:12.1.0   "/run.sh"                grafana      4 seconds ago   Up 1 second    0.0.0.0:3001->3000/tcp, [::]:3001->3000/tcp
+devops-final-prometheus-1   prom/prometheus:v3.5.0   "/bin/prometheus --c…"   prometheus   4 seconds ago   Up 2 seconds   0.0.0.0:9090->9090/tcp, [::]:9090->9090/tcp
